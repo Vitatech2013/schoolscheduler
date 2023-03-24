@@ -1,0 +1,99 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<html>
+    <body onload="Profile()">        
+    </body>
+</html>
+<div class="row">
+    <div class="col-md-5"></div>
+    <div class="col-md-2"><label>Faculty Id</label><input type="text" name="id" id="id" class="form-control" placeholder="Faculty Name"></div>
+    <div class="col-md-5"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-3"><label>Faculty Name</label><input type="text" name="name" id="name" class="form-control" placeholder="Faculty Name"></div>
+    <div class="col-md-3"><label>Father Name</label><input type="text" name="fname" id="fname" class="form-control" placeholder="Father Name"></div>
+    <div class="col-md-2"><label>Gender</label><br><input type="radio" id="male" name="gender" value="Male" /> Male &nbsp; <input name="gender" type="radio" id="female" value="Female" /> Female</div>
+    <div class="col-md-2"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-3"><label>Mobile number</label><input type="mobile" id="mobile" class="form-control" placeholder="Mobile Number"></div>
+    <div class="col-md-3"><label>Email Id</label><input type="email" name="emailid" id="emailid" class="form-control" placeholder="Email Id"></div>
+    <div class="col-md-3"><label>Date of Birth</label><input type="date" name="dob" id="dob" class="form-control"></div>
+    <div class="col-md-2"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-3"><label>Experience</label><input type="exp" id="exp" class="form-control" placeholder="Experience"></div>
+    <div class="col-md-3"><label>Subject</label><br><select name="sub" id="sub" class="form-control">
+            <option value="--Select--">--Select--</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+            <option value="Maths">Maths</option>
+            <option value="Science">Science</option>
+            <option value="Social">Social</option>
+        </select>
+    </div>
+    <div class="col-md-3"><label>Date of join</label><br><input type="date" name="doj" id="doj" class="form-control"></div>    
+    <div class="col-md-1"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-3"><label>Address</label><textarea name="add" id="add" rows="4" class="form-control"></textarea></div>
+    
+    <div class="col-md-5"></div>
+</div>
+<br>
+<script>
+    const id=sessionStorage.getItem("_id");
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function Profile() {
+        const getProfilePromise = performAjax("GET", `http://localhost:1234/faculty/viewprofile?_id=${id}`);
+        getProfilePromise
+        .then((data) => {
+            const profile = [JSON.parse(data)].map(record => {
+                return record;
+            });
+            profile.map(rec => {
+                document.getElementById("id").value=rec.facultyid;
+                document.getElementById("name").value=rec.name;
+                document.getElementById("fname").value=rec.fathername;
+                rec.gender === "Male" ? document.getElementById("male").checked = true : document.getElementById("female").checked = true;                
+                document.getElementById("mobile").value=rec.mobileno;
+                document.getElementById("emailid").value=rec.emailid;
+                document.getElementById("dob").value=rec.dob;
+                document.getElementById("exp").value=rec.experiance;
+                document.getElementById("sub").value=rec.subject;
+                document.getElementById("doj").value=rec.doj;
+                document.getElementById("add").value=rec.address;
+            });
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+</script>

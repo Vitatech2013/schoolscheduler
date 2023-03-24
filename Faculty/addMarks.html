@@ -1,0 +1,150 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+<div class="row">
+    <div class="col-md-5"></div>
+    <div class="col-md-3"><label style="color:black; font-weight: bold; font-size: large">Add Marks Details</label></div>
+    <div class="col-md-4"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-5"></div>
+    <div class="col-md-2 text-center"><label>Student Roll Number</label><br><input type="text" name="stdid" id="stdid" class="form-control" placeholder="Roll Number" onchange="getStudentDetails()"></div>
+    <div class="col-md-5"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-2"><label>Student Name</label><br><input type="text" name="name" id="name" class="form-control" disabled></div>
+    <div class="col-md-2"><label>Class</label><br><input type="text" name="cls" id="cls" class="form-control" disabled></div>
+    <div class="col-md-2"><label>Section</label><br><input type="text" name="sec" id="sec" class="form-control" disabled></div>
+    <div class="col-md-3"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-2"><label>Exam Type</label><br><select name="type" id="type" class="form-control">
+            <option value="--Select--">--Select--</option>
+            <option value="1st Unit Test">1st Unit Test</option>
+            <option value="Quarterly Exam">Quarterly Exam</option>
+            <option value="2nd Unit Test">2nd Unit Test</option>
+            <option value="Half Yearly Exam">Half Yearly Exam</option>
+            <option value="3rd Unit Test">3rd Unit Test</option>
+            <option value="Final Exam">Final Exam</option>
+        </select>
+    </div>
+    <div class="col-md-2"><label>Subject</label><br><select name="sub" id="sub" class="form-control">
+            <option value="--Select--">--Select--</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+            <option value="Maths">Maths</option>
+            <option value="Science">Science</option>
+            <option value="Social">Social</option>
+        </select>
+    </div>
+    <div class="col-md-2"><label>Marks</label><br><input type="text" name="marks" id="marks" class="form-control"></div>
+    <div class="col-md-3"></div>
+</div><br><br>
+<div class="row">
+    <div class="col-md-5"></div>
+    <div class="col-md-2 text-center">
+        <button type="button" id="submit" class="btn btn-info" onclick="AddMarks()">Submit</button>
+        <label id="msg" style="visibility: hidden; color: red;">There is No Student for this Roll Number</label>
+    </div>    
+    <div class="col-md-5"></div>
+</div><br><br>
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function getStudentDetails() {
+        var stdid = document.getElementById("stdid").value;
+        const getStudentPromise = performAjax("GET", `http://localhost:1234/faculty/getstudent?studentid=${stdid}`);
+        getStudentPromise
+        .then((data) => {
+            const student = JSON.parse(data);
+            if(student.length > 0) {
+                student.map(std => {
+                    document.getElementById("submit").style.visibility = "visible";
+                    document.getElementById("msg").style.visibility = "hidden";
+                    document.getElementById("name").value = std.name;
+                    document.getElementById("cls").value = std.classs;
+                    document.getElementById("sec").value = std.section;
+                });
+            }
+            else {
+                document.getElementById("submit").style.visibility = "hidden";
+                document.getElementById("msg").style.visibility = "visible";
+            }
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+    function AddMarks() {
+        const facultyid=sessionStorage.getItem("facultyid");
+        let totalmarks="";
+        let result="";
+        const studentid = document.getElementById("stdid").value;
+        const classs = document.getElementById("cls").value;
+        const section = document.getElementById("sec").value;
+        const subject = document.getElementById("sub").value;
+        const type = document.getElementById("type").value;
+        const marks = document.getElementById("marks").value;
+
+        if(type == "1st Unit Test" || type == "2nd Unit Test" || type == "3rd Unit Test") {
+            totalmarks = 25;
+        }
+        else if(type == "Quarterly Exam" || type == "Half Yearly Exam" || type == "Final Exam") {
+            totalmarks = 100;
+        }
+        const avg = (parseFloat(marks) / parseFloat(totalmarks)) * 100;        
+        if(avg>=75) {
+            result="A";
+        }
+        else if(avg>=60 && avg<75) {
+            result="B";
+        }
+        else if(avg>=45 && avg<60) {
+            result="C";
+        }
+        else if(avg>=35 && avg<45) {
+            result="D";
+        }
+        else {
+            result="Fail";
+        }
+        
+        const getAddMarksPromise = performAjax(
+            "POST",
+            `http://localhost:1234/faculty/addmarks`,
+            JSON.stringify({ facultyid, studentid, classs, section, subject, type, totalmarks, marks, result })
+        );
+        getAddMarksPromise
+        .then((addMarksPromise) => {
+            alert('Marks Stored');
+        })
+        .catch(err => {
+            alert(err.message);
+        })          
+    }
+
+</script>

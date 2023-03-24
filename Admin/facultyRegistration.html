@@ -1,0 +1,134 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<form onsubmit="Register()">
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4"><label style="color:black; font-weight: bold; font-size: large">FACULTY REGISTRATION</label></div>
+    <div class="col-md-4"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-3"><label>Faculty Name</label><input type="text" name="name" id="name" class="form-control" placeholder="Faculty Name"></div>
+    <div class="col-md-3"><label>Father Name</label><input type="text" name="fname" id="fname" class="form-control" placeholder="Father Name"></div>
+    <div class="col-md-2"><label>Gender</label><br><input type="radio" id="male" name="gender" value="Male" checked="tue"/> Male &nbsp; <input name="gender" type="radio" id="female" value="Female" /> Female</div>
+    <div class="col-md-2"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-3"><label>Mobile Number</label><input type="text" maxlength="10" id="mobile" class="form-control" placeholder="Mobile Number" required pattern="[6-9]{1}[0-9]{9}"></div>
+    <div class="col-md-3"><label>Email Id</label><input type="text" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" name="emailid" id="emailid" class="form-control" placeholder="Email Id"></div>
+    <div class="col-md-3"><label>Date of Birth</label><input type="date" name="dob" id="dob" class="form-control"></div>
+    <div class="col-md-2"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-3"><label>Experience</label><input type="exp" id="exp" class="form-control" placeholder="Experience"></div>
+    <div class="col-md-3"><label>Subject</label><br><select name="sub" id="sub" class="form-control">
+            <option value="--Select--">--Select--</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+            <option value="Maths">Maths</option>
+            <option value="Science">Science</option>
+            <option value="Social">Social</option>
+        </select>
+    </div>
+    <div class="col-md-3"><label>Date of join</label><br><input type="date" name="doj" id="doj" class="form-control"></div>    
+    <div class="col-md-1"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-3"><label>Address</label><textarea name="add" id="add" rows="5" class="form-control"></textarea></div>
+    <div class="col-md-3 text-center" style="margin-top: 60px;"><button type="submit" class="btn btn-info">Register</button></div>
+    <div class="col-md-5"></div>
+</div>
+</form>
+<br>
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function Register() {
+        event.preventDefault();
+        let facultyid="";
+        const getCountPromise = performAjax(
+            "GET",
+            `http://localhost:1234/admin/fcount`
+        );
+        getCountPromise
+        .then((count) => {
+            var a = parseInt(count.substring(1, count.length-1)) + 1;
+            if(a>=1 && a<=9) {
+                facultyid="VEC000"+a;
+            }
+            else if(a>=10 && a<=99) {
+                facultyid="VEC00"+a;
+            }
+            else if(a>=100 && a<=999) {
+                facultyid="VEC0"+a;
+            }
+            else if(a>=1000 && a<=9999) {
+                facultyid="VEC"+a;
+            }
+
+            const name = document.getElementById("name").value;
+            const fathername = document.getElementById("fname").value;
+            const gender = document.getElementById("male").checked ? "Male":"Female";
+            const mobileno = document.getElementById("mobile").value;
+            const emailid = document.getElementById("emailid").value;
+            const dob = document.getElementById("dob").value;
+            const experiance = document.getElementById("exp").value;
+            const subject = document.getElementById("sub").value;
+            const doj = document.getElementById("doj").value;
+            const address = document.getElementById("add").value;
+            const password= Math.floor((Math.random() * 100000) + 1);
+            
+            const getRegPromise = performAjax(
+                "POST",
+                `http://localhost:1234/admin/fregistration`,
+                JSON.stringify({ facultyid, name, fathername, gender, mobileno, emailid, password, dob, experiance, subject, doj, address })
+            );
+            getRegPromise
+            .then((regPromise) => {
+                alert('Registration Successfully Completed');
+                const name = document.getElementById("name").value="";
+            const fathername = document.getElementById("fname").value="";
+            const gender = document.getElementById("male").checked ? "Male":"Female";
+            const mobileno = document.getElementById("mobile").value="";
+            const emailid = document.getElementById("emailid").value="";
+            const dob = document.getElementById("dob").value="";
+            const experiance = document.getElementById("exp").value="";
+            const subject = document.getElementById("sub").value="";
+            const doj = document.getElementById("doj").value="";
+            const address = document.getElementById("add").value="";
+             
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+        })
+        .catch(err => {
+            alert(err.message);
+        })            
+    }
+
+</script>

@@ -1,0 +1,191 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<html>
+    <style>
+        .tablecss {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;
+        }
+        .tablecss td, .tablecss th {
+            border: 1px solid #ddd; padding: 8px;
+        }
+        .tablecss tr:nth-child(odd){ background-color: #f2f2f2; }
+        .tablecss tr:hover { background-color: #ddd; }
+        .tablecss th {
+            padding-top: 12px; padding-bottom: 12px; text-align: center; background-color: lavender; color: black; font-weight: bold;
+        }
+    </style>
+    <body onload="loadData()">
+        <center>
+            <h3>Faculty Details</h3>
+            <table id="faculty" class="tablecss" style="width: 100%;"></table>
+        </center>
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Faculty Details</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-md-4"><label>Faculty Id</label><input type="text" name="factid" id="factid" class="form-control" readonly="true"></div>
+                                <div class="col-md-4"><label>Faculty Name</label><input type="text" name="name" id="name" class="form-control" placeholder="Faculty Name"></div>
+                                <div class="col-md-4"><label>Father Name</label><input type="text" name="fname" id="fname" class="form-control" placeholder="Father Name"></div>                                                                
+                            </div><br>
+                            <div class="row">
+                                <div class="col-md-4"><label>Gender</label><br><input type="radio" id="male" name="gender" value="Male" /> Male &nbsp; <input name="gender" type="radio" id="female" value="Female" /> Female</div>
+                                <div class="col-md-4"><label>Mobile number</label><input type="mobile" id="mobile" class="form-control" placeholder="Mobile Number"></div>
+                                <div class="col-md-4"><label>Email Id</label><input type="email" name="emailid" id="emailid" class="form-control" placeholder="Email Id"></div>                                                                
+                            </div><br>
+                            <div class="row">
+                                <div class="col-md-4"><label>Date of Birth</label><input type="date" name="dob" id="dob" class="form-control"></div>
+                                <div class="col-md-4"><label>Experience</label><input type="exp" id="exp" class="form-control" placeholder="Experience"></div>
+                                <div class="col-md-4"><label>Subject</label><br><select name="sub" id="sub" class="form-control">
+                                        <option value="--Select--">--Select--</option>
+                                        <option value="Telugu">Telugu</option>
+                                        <option value="Hindi">Hindi</option>
+                                        <option value="English">English</option>
+                                        <option value="Maths">Maths</option>
+                                        <option value="Science">Science</option>
+                                        <option value="Social">Social</option>
+                                    </select>
+                                </div>
+                            </div><br>
+                            <div class="row">
+                                <div class="col-md-4"><label>Address</label><textarea name="add" id="add" rows="4" class="form-control"></textarea></div>
+                                <div class="col-md-4"><input type="hidden" name="id" id="id" class="form-control"></div>
+                                <div class="col-md-4"><br><br>
+                                    <button type="button" id="submit" class="btn btn-info" data-dismiss="modal" onclick="Update()">Update</button>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </form>   
+                    </div>
+                </div>
+            </div>
+        </div>          
+    </body>
+</html>
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function loadData() {
+        const getFacultyPromise = performAjax("GET", "http://localhost:1234/admin/fview");
+        getFacultyPromise
+        .then((facultyList) => {
+            showFacultyDetails(facultyList);
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+    function showFacultyDetails(data) {
+        const records = JSON.parse(data);
+        let tableRow = '';
+        const tableHeader = `<tr style="background: lavender;"><th>S.No.</th><th>Faculty&nbsp;Id</th><th>Faculty&nbsp;Name</th><th>Father&nbsp;Name</th><th>Gender</th><th>Mobile&nbsp;Number</th><th>Email&nbsp;Id</th><th>DOB</th><th>Experience</th><th>Subject</th><th>DOJ</th><th>address</th><th>Action</th></tr>`;
+        if(records.length > 0) {
+            tableRow = records.map((rec, index) => {
+                let editButton = `<a id="${rec._id}" class="fa fa-pencil" style="color:blue; font-size:22px;" data-toggle="modal" data-target="#myModal" onclick="editRecord(event)"></a>`;
+                let deleteButton = `<a id="${rec._id}" class="fa fa-trash" style="color:blue; font-size:22px;" onclick="deleteRecord(event)"></a>`;
+                return `<tr><td align="right">${index + 1}</td><td>${rec.facultyid}</td><td>${rec.name}</td><td>${rec.fathername}</td><td>${rec.gender}</td><td>${rec.mobileno}</td><td>${rec.emailid}</td><td>${rec.dob}</td><td>${rec.experiance}</td><td>${rec.subject}</td><td>${rec.doj}</td><td>${rec.address}</td><td align="center">${editButton}&nbsp;&nbsp;${deleteButton}</td></tr>`;
+            });
+            document.getElementById("faculty").innerHTML = `${tableHeader}${tableRow.join('')}`;
+        }
+        else {
+            tableRow = `<tr><td colspan="12" align="center">No Data Found</td></tr>`;
+            document.getElementById("faculty").innerHTML = `${tableHeader}${tableRow}`;
+        }                
+    }    
+    
+    function editRecord(event) {
+        event.preventDefault();
+        const getEditRecordPromise = performAjax("GET", `http://localhost:1234/admin/fview/${event.target.id}`);
+        getEditRecordPromise
+        .then((editRecord) => { 
+            const data = JSON.parse(editRecord);
+            const record = [data].map(record => {
+                return record;
+            });
+            record.map(rec => {
+                document.getElementById("factid").value = rec.facultyid;  
+                document.getElementById("name").value = rec.name;                   
+                document.getElementById("fname").value = rec.fathername;
+                rec.gender === "Male" ? document.getElementById("male").checked = true : document.getElementById("female").checked = true;
+                document.getElementById("mobile").value = rec.mobileno;
+                document.getElementById("emailid").value = rec.emailid;
+                document.getElementById("dob").value = rec.dob;
+                document.getElementById("exp").value = rec.experiance; 
+                document.getElementById("sub").value = rec.subject;  
+                document.getElementById("add").value = rec.address;
+                document.getElementById("id").value = event.target.id; 
+            })                        
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+    function Update() {
+        const id=document.getElementById("id").value;
+        const name = document.getElementById("name").value;
+        const fathername = document.getElementById("fname").value;
+        const gender = document.getElementById("male").checked ? "Male":"Female";
+        const mobileno = document.getElementById("mobile").value;
+        const emailid = document.getElementById("emailid").value;
+        const dob = document.getElementById("dob").value;
+        const experiance = document.getElementById("exp").value;
+        const subject = document.getElementById("sub").value;
+        const address = document.getElementById("add").value;
+        
+        const getUpdatePromise = performAjax(
+            "PUT",
+            `http://localhost:1234/admin/fupdate/${id}`,
+            JSON.stringify({ name, fathername, gender, mobileno, emailid, dob, experiance, subject, address })
+        );
+        getUpdatePromise
+        .then((response) => {
+            alert('Faculty Details Updated');
+            loadData();
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+    function deleteRecord(event) {
+        event.preventDefault();
+        const deletePromise = performAjax('DELETE', `http://localhost:1234/admin/fdelete/${event.target.id}`);
+        deletePromise
+        .then((remainingFaculty) => {
+            loadData();
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+</script>

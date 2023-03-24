@@ -1,0 +1,256 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+    .tablecss {
+        font-family: 'Times New Roman', Times, serif; border-collapse: collapse; border: 1px solid #ddd; width: 99%; font-size: 15px;
+    }
+    .tablecss td, .tablecss th {
+        border: 1px solid #ddd; padding: 5px;
+    }
+    .tablecss tr:nth-child(odd){ background-color: #f2f2f2; }
+    .tablecss tr:hover { background-color: #ddd; }
+    .tablecss th {
+        padding-top: 12px; padding-bottom: 12px; text-align: center; background-color: lavender; color: black; font-weight: bold;
+    }
+</style>
+   
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-2"><label>Class</label><br><select name="cls" id="cls" class="form-control">
+            <option value="--Select--">--Select--</option>
+            <option value="V">V</option>
+            <option value="VI">VI</option>
+            <option value="VII">VII</option>
+            <option value="VIII">VIII</option>
+            <option value="IX">IX</option>
+            <option value="X">X</option>
+        </select>
+    </div>
+    <div class="col-md-2"><label>Section</label><br><select name="sec" id="sec" class="form-control">
+            <option value="--Select--">--Select--</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+        </select>
+    </div>
+    <div class="col-md-2"><label>Exam Type</label><br><select name="type" id="type" class="form-control">
+            <option value="--Select--">--Select--</option>
+            <option value="1st Unit Test">1st Unit Test</option>
+            <option value="Quarterly Exam">Quarterly Exam</option>
+            <option value="2nd Unit Test">2nd Unit Test</option>
+            <option value="Half Yearly Exam">Half Yearly Exam</option>
+            <option value="3rd Unit Test">3rd Unit Test</option>
+            <option value="Final Exam">Final Exam</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <br><button type="button" class="btn btn-info" onclick="View()">View Marks</button>
+    </div>
+    <div class="col-md-2"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-12 text-center">
+        <table id="table" class="tablecss"></table>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col-md-12">
+        <label>1st Unit Test Maximum Marks: 25</label><br>
+        <label>Quarterly Exam Maximum Marks: 100</label><br>
+        <label>2nd Unit Test Maximum Marks: 25</label><br>
+        <label>Half Yearly Exam Maximum Marks: 100</label><br>
+        <label>3rd Unit Test Maximum Marks: 25</label><br>
+        <label>Final Exam Maximum Marks: 100</label>
+    </div>
+</div><br><br><br>
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Marks Details</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4 text-center"><label>Roll Number</label><br><input type="text" name="stdid" id="stdid" class="form-control" placeholder="Roll Number" onchange="getStudentDetails()"></div>
+                        <div class="col-md-4"></div>
+                    </div><br>
+                    <div class="row">
+                        <div class="col-md-4"><label>Exam Type</label><br><select name="type1" id="type1" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="1st Unit Test">1st Unit Test</option>
+                                <option value="Quarterly Exam">Quarterly Exam</option>
+                                <option value="2nd Unit Test">2nd Unit Test</option>
+                                <option value="Half Yearly Exam">Half Yearly Exam</option>
+                                <option value="3rd Unit Test">3rd Unit Test</option>
+                                <option value="Final Exam">Final Exam</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4"><label>Subject</label><br><select name="sub" id="sub" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="English">English</option>
+                                <option value="Maths">Maths</option>
+                                <option value="Science">Science</option>
+                                <option value="Social">Social</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4"><label>Marks</label><br><input type="text" name="marks" id="marks" class="form-control"></div>                        
+                    </div><br>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4"><input type="hidden" name="id" id="id" class="form-control"></div>
+                        <div class="col-md-4"><br><br>
+                            <button type="button" id="submit" class="btn btn-info" data-dismiss="modal" onclick="Update()">Update</button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>   
+            </div>
+        </div>                  
+    </div>
+</div> 
+<script>
+    const facultyid=sessionStorage.getItem("facultyid");
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function View() {
+        const type = document.getElementById("type").value;
+        const classs = document.getElementById("cls").value;
+        const section = document.getElementById("sec").value;
+        const getMarksPromise = performAjax("GET", `http://localhost:1234/faculty/viewmarks?classs=${classs}&section=${section}&type=${type}&facultyid=${facultyid}`);
+        getMarksPromise
+        .then((marks) => {
+            showMarksDetails(marks);
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+    
+    function showMarksDetails(data) {
+        const records = JSON.parse(data);
+        let tableRow = '';
+        const tableHeader = `<tr style="background: lavender;"><th>S.No.</th><th>Student Id</th><th>Subject</th><th>Total Marks</th><th>Marks Scored</th><th>Result</th><th>Actions</th></tr>`;
+        if(records.length > 0) {
+            tableRow = records.map((rec, index) => {
+                let editButton = `<a id="${rec._id}" class="fa fa-pencil" style="color:blue; font-size:22px;" data-toggle="modal" data-target="#myModal" onclick="editRecord(event)"></a>`;
+                let deleteButton = `<a id="${rec._id}" class="fa fa-trash" style="color:blue; font-size:22px;" onclick="deleteRecord(event)"></a>`;
+                return `<tr><td align="right">${index + 1}</td><td>${rec.studentid}</td><td>${rec.subject}</td><td>${rec.totalmarks}</td><td>${rec.marks}</td><td>${rec.result}</td><td align="center">${editButton}&nbsp;&nbsp;&nbsp;${deleteButton}</td></tr>`;
+            });
+            document.getElementById("table").innerHTML = `${tableHeader}${tableRow.join('')}`;
+        }
+        else {
+            tableRow = `<tr><td colspan="7" align="center">No Data Found</td></tr>`;
+            document.getElementById("table").innerHTML = `${tableHeader}${tableRow}`;
+        }                 
+    }    
+    
+    function editRecord(event) {
+        event.preventDefault();
+        const getEditRecordPromise = performAjax("GET", `http://localhost:1234/faculty/viewmarks/${event.target.id}`);
+        getEditRecordPromise
+        .then((editRecord) => { 
+            const data = JSON.parse(editRecord);
+            const record = [data].map(record => {
+                return record;
+            });
+            record.map(rec => {
+                document.getElementById("stdid").value = rec.studentid;  
+                document.getElementById("sub").value = rec.subject;
+                document.getElementById("type1").value = rec.type;
+                document.getElementById("marks").value = rec.marks;
+                document.getElementById("id").value = event.target.id; 
+            })                        
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+    function Update() {
+        let totalmarks="";
+        let result="";
+        const id=document.getElementById("id").value;
+        const studentid = document.getElementById("stdid").value;
+        const subject = document.getElementById("sub").value;
+        const type = document.getElementById("type1").value;
+        const marks = document.getElementById("marks").value;
+
+        if(type == "1st Unit Test" || type == "2nd Unit Test" || type == "3rd Unit Test") {
+            totalmarks = 25;
+        }
+        else if(type == "Quarterly Exam" || type == "Half Yearly Exam" || type == "Final Exam") {
+            totalmarks = 100;
+        }
+        const avg = (parseFloat(marks) / parseFloat(totalmarks)) * 100;        
+        if(avg>=75) {
+            result="A";
+        }
+        else if(avg>=60 && avg<75) {
+            result="B";
+        }
+        else if(avg>=45 && avg<60) {
+            result="C";
+        }
+        else if(avg>=35 && avg<45) {
+            result="D";
+        }
+        else {
+            result="Fail";
+        }  
+        
+        const getUpdatePromise = performAjax(
+            "PUT",
+            `http://localhost:1234/faculty/updatemarks/${id}`,
+            JSON.stringify({ studentid, subject, type, totalmarks, marks, result })
+        );
+        getUpdatePromise
+        .then((response) => {
+            alert('Student Marks Updated');
+            View();
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+    function deleteRecord(event) {
+        event.preventDefault();
+        const deletePromise = performAjax('DELETE', `http://localhost:1234/faculty/deletemarks/${event.target.id}`);
+        deletePromise
+        .then((remainingRecords) => {
+            View();
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+</script>

@@ -1,0 +1,414 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+    .tablecss {
+        font-family: 'Times New Roman', Times, serif; border-collapse: collapse; border: 1px solid #ddd; width: 99%; font-size: 15px;
+    }
+    .tablecss td, .tablecss th {
+        border: 1px solid #ddd; padding: 5px;
+    }
+    .tablecss tr:nth-child(odd){ background-color: #f2f2f2; }
+    .tablecss tr:hover { background-color: #ddd; }
+    .tablecss th {
+        padding-top: 12px; padding-bottom: 12px; text-align: center; background-color: lavender; color: black; font-weight: bold;
+    }
+</style>
+<html>
+    <body onload="getFacultyId()">        
+    </body>
+</html>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-2"><label>Class</label><br><select name="cls" id="cls" class="form-control">
+            <option value="--Select--">--Select--</option>
+            <option value="V">V</option>
+            <option value="VI">VI</option>
+            <option value="VII">VII</option>
+            <option value="VIII">VIII</option>
+            <option value="IX">IX</option>
+            <option value="X">X</option>
+        </select>
+    </div>
+    <div class="col-md-2"><label>Section</label><br><select name="sec" id="sec" class="form-control">
+            <option value="--Select--">--Select--</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <br><button type="button" class="btn btn-info" onclick="View()">View Time Table</button>
+    </div>
+    <div class="col-md-3"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-12 text-center">
+        <table id="table" class="tablecss"></table>
+    </div>
+</div><br>
+<div class="row">
+    <div class="col-md-12">
+        <label>Break Time: 11:30 to 11:40</label><br>
+        <label>Lunch Time: 12:40 to 01:20</label><br>
+        <label>Break Time: 03:20 to 03:30</label>
+    </div>
+</div><br><br><br>
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Time Table Details</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-2"><label>Day</label><br><select name="day1" id="day1" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Class</label><br><select name="cls1" id="cls1" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="V">V</option>
+                                <option value="VI">VI</option>
+                                <option value="VII">VII</option>
+                                <option value="VIII">VIII</option>
+                                <option value="IX">IX</option>
+                                <option value="X">X</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Section</label><br><select name="sec1" id="sec1" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div><br>
+                    <div class="row">
+                        <div class="col-md-2"><label>Hour 1</label><br><select name="hr1" id="hr1" class="form-control" disabled>
+                                <option value="--Select--">--Select--</option>
+                                <option selected>09:30 to 10:30</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Subject</label><br><select name="sub1" id="sub1" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="English">English</option>
+                                <option value="Maths">Maths</option>
+                                <option value="Science">Science</option>
+                                <option value="Social">Social</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Faculty</label><br><select name="faculty1" id="faculty1" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Hour 2</label><br><select name="hr2" id="hr2" class="form-control" disabled>
+                                <option value="--Select--">--Select--</option>
+                                <option selected>10:30 to 11:30</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Subject</label><br><select name="sub2" id="sub2" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="English">English</option>
+                                <option value="Maths">Maths</option>
+                                <option value="Science">Science</option>
+                                <option value="Social">Social</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Faculty</label><br><select name="faculty2" id="faculty2" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                            </select>
+                        </div>
+                    </div><br>
+                    <div class="row">
+                        <div class="col-md-2"><label>Hour 3</label><br><select name="hr3" id="hr3" class="form-control" disabled>
+                                <option value="--Select--">--Select--</option>
+                                <option selected>11:40 to 12:40</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Subject</label><br><select name="sub3" id="sub3" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="English">English</option>
+                                <option value="Maths">Maths</option>
+                                <option value="Science">Science</option>
+                                <option value="Social">Social</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Faculty</label><br><select name="faculty3" id="faculty3" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Hour 4</label><br><select name="hr4" id="hr4" class="form-control" disabled>
+                                <option value="--Select--">--Select--</option>
+                                <option selected>01:20 to 02:20</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Subject</label><br><select name="sub4" id="sub4" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="English">English</option>
+                                <option value="Maths">Maths</option>
+                                <option value="Science">Science</option>
+                                <option value="Social">Social</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Faculty</label><br><select name="faculty4" id="faculty4" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                            </select>
+                        </div>
+                    </div><br>
+                    <div class="row">
+                        <div class="col-md-2"><label>Hour 5</label><br><select name="hr5" id="hr5" class="form-control" disabled>
+                                <option value="--Select--">--Select--</option>
+                                <option selected>02:20 to 03:20</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Subject</label><br><select name="sub5" id="sub5" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="English">English</option>
+                                <option value="Maths">Maths</option>
+                                <option value="Science">Science</option>
+                                <option value="Social">Social</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Faculty</label><br><select name="faculty5" id="faculty5" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Hour 6</label><br><select name="hr6" id="hr6" class="form-control" disabled>
+                                <option value="--Select--">--Select--</option>
+                                <option selected>03:30 to 04:30</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Subject</label><br><select name="sub6" id="sub6" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="English">English</option>
+                                <option value="Maths">Maths</option>
+                                <option value="Science">Science</option>
+                                <option value="Social">Social</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><label>Faculty</label><br><select name="faculty6" id="faculty6" class="form-control">
+                                <option value="--Select--">--Select--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4"><input type="hidden" name="id" id="id" class="form-control"></div>
+                        <div class="col-md-4"><br><br>
+                            <button type="button" id="submit" class="btn btn-info" data-dismiss="modal" onclick="Update()">Update</button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>   
+            </div>
+        </div>
+    </div>
+</div>  
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function getFacultyId() {
+        const getFacultyPromise = performAjax("GET", "http://localhost:1234/admin/fview");
+        getFacultyPromise
+        .then((facultyList) => {
+            bindFacultyId(facultyList);
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+        
+    function bindFacultyId(data) {
+        const faculty = JSON.parse(data);
+        let facultys1 = document.getElementById("faculty1");
+        let facultys2 = document.getElementById("faculty2");
+        let facultys3 = document.getElementById("faculty3");
+        let facultys4 = document.getElementById("faculty4");
+        let facultys5 = document.getElementById("faculty5");
+        let facultys6 = document.getElementById("faculty6");
+
+        for (let i = 0; i < faculty.length; i++) {
+            let option1 = document.createElement("OPTION");
+            let option2 = document.createElement("OPTION");
+            let option3 = document.createElement("OPTION");
+            let option4 = document.createElement("OPTION");
+            let option5 = document.createElement("OPTION");
+            let option6 = document.createElement("OPTION");
+            option1.innerHTML = option2.innerHTML = option3.innerHTML = option4.innerHTML = option5.innerHTML = option6.innerHTML = faculty[i].facultyid+"--"+faculty[i].name;
+            option1.value = option2.value = option3.value = option4.value = option5.value = option6.value = faculty[i].facultyid;
+            facultys1.options.add(option1);
+            facultys2.options.add(option2);
+            facultys3.options.add(option3);
+            facultys4.options.add(option4);
+            facultys5.options.add(option5);
+            facultys6.options.add(option6);
+        }     
+    }
+
+    function View() {
+        const classs = document.getElementById("cls").value;
+        const section = document.getElementById("sec").value;
+        const getTimeTablePromise = performAjax("GET", `http://localhost:1234/admin/ttview?classs=${classs}&section=${section}`);
+        getTimeTablePromise
+        .then((timeTableList) => {
+            showTimeTableDetails(timeTableList);
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+    function showTimeTableDetails(data) {
+        const records = JSON.parse(data);
+        let tableRow = '';
+        const tableHeader = `<tr style="background: lavender;"><th>Day</th><th>09:30&nbsp;-&nbsp;10:30</th><th>Faculty</th><th>10:30&nbsp;-&nbsp;11:30</th><th>Faculty</th><th>Break</th><th>11:40&nbsp;-&nbsp;12:40</th><th>Faculty</th><th>Lunch</th><th>01:20&nbsp;-&nbsp;02:10</th><th>Faculty</th><th>02:20&nbsp;-&nbsp;03:20</th><th>Faculty</th><th>Break</th><th>03:30&nbsp;-&nbsp;04:30</th><th>Faculty</th><th>Actions</th></tr>`;
+        if(records.length > 0) {
+            tableRow = records.map((rec, index) => {
+                let editButton = `<a id="${rec._id}" class="fa fa-pencil" style="color:blue; font-size:22px;" data-toggle="modal" data-target="#myModal" onclick="editRecord(event)"></a>`;
+                let deleteButton = `<a id="${rec._id}" class="fa fa-trash" style="color:blue; font-size:22px;" onclick="deleteRecord(event)"></a>`;
+                return `<tr><td>${rec.day}</td><td>${rec.subject1}</td><td>${rec.faculty1}</td><td>${rec.subject2}</td><td>${rec.faculty2}</td><td></td><td>${rec.subject3}</td><td>${rec.faculty3}</td><td></td><td>${rec.subject4}</td><td>${rec.faculty4}</td><td>${rec.subject5}</td><td>${rec.faculty5}</td><td></td><td>${rec.subject6}</td><td>${rec.faculty6}</td><td align="center">${editButton}&nbsp;&nbsp;&nbsp;${deleteButton}</td></tr>`;
+            });
+            document.getElementById("table").innerHTML = `${tableHeader}${tableRow.join('')}`;
+        }
+        else {
+            tableRow = `<tr><td colspan="17" align="center">No Data Found</td></tr>`;
+            document.getElementById("table").innerHTML = `${tableHeader}${tableRow}`;
+        }                
+    } 
+    
+    function editRecord(event) {
+        event.preventDefault();
+        const getEditRecordPromise = performAjax("GET", `http://localhost:1234/admin/ttview/${event.target.id}`);
+        getEditRecordPromise
+        .then((editRecord) => { 
+            const data = JSON.parse(editRecord);
+            const record = [data].map(record => {
+                return record;
+            });
+            record.map(rec => {
+                document.getElementById("id").value = event.target.id;
+                document.getElementById("day1").value = rec.day;
+                document.getElementById("cls1").value = rec.classs;
+                document.getElementById("sec1").value = rec.section;
+                
+                document.getElementById("sub1").value = rec.subject1;
+                document.getElementById("faculty1").value = rec.faculty1;
+                
+                document.getElementById("sub2").value = rec.subject2;
+                document.getElementById("faculty2").value = rec.faculty2;
+                
+                document.getElementById("sub3").value = rec.subject3;
+                document.getElementById("faculty3").value = rec.faculty3;
+                
+                document.getElementById("sub4").value = rec.subject4;
+                document.getElementById("faculty4").value = rec.faculty4;
+                
+                document.getElementById("sub5").value = rec.subject5;
+                document.getElementById("faculty5").value = rec.faculty5;
+                
+                document.getElementById("sub6").value = rec.subject6;
+                document.getElementById("faculty6").value = rec.faculty6;
+            })                        
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+    function Update() {
+        const id = document.getElementById("id").value;
+        const day = document.getElementById("day1").value;
+        const classs = document.getElementById("cls1").value;
+        const section = document.getElementById("sec1").value;
+        
+        const subject1 = document.getElementById("sub1").value;
+        const faculty1 = document.getElementById("faculty1").value;
+        
+        const subject2 = document.getElementById("sub2").value;
+        const faculty2 = document.getElementById("faculty2").value;
+        
+        const subject3 = document.getElementById("sub3").value;
+        const faculty3 = document.getElementById("faculty3").value;
+        
+        const subject4 = document.getElementById("sub4").value;
+        const faculty4 = document.getElementById("faculty4").value;
+        
+        const subject5 = document.getElementById("sub5").value;
+        const faculty5 = document.getElementById("faculty5").value;
+        
+        const subject6 = document.getElementById("sub6").value;
+        const faculty6 = document.getElementById("faculty6").value;
+        
+        const getUpdatePromise = performAjax(
+            "PUT",
+            `http://localhost:1234/admin/ttupdate/${id}`,
+            JSON.stringify({ day, classs, section, subject1, faculty1, subject2, faculty2, subject3, faculty3, subject4, faculty4, subject5, faculty5, subject6, faculty6 })
+        );
+        getUpdatePromise
+        .then((response) => {
+            alert('Time Table Details Updated');
+            View();
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+    function deleteRecord(event) {
+        event.preventDefault();
+        const deletePromise = performAjax('DELETE', `http://localhost:1234/admin/ttdelete/${event.target.id}`);
+        deletePromise
+        .then((remainingTimeTable) => {
+            View();
+        })
+        .catch(err => {
+            alert(err.message);
+        })
+    }
+
+</script>
